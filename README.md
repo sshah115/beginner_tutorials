@@ -18,7 +18,7 @@ UID - 119340547
 
 4) Write a simple publisher and subscriber node as described in assignment deliverables.
 
-![Pub_sub_image](./../beginner_tutorials/result/pub_sub_image.png "Publisher-Subscriber result")
+![Pub_sub_image](./result/pub_sub_image.png "Publisher-Subscriber result")
 
 5) Modified the code to adhere to *Google C++ Style Guide* using clang-format.
 
@@ -26,7 +26,7 @@ UID - 119340547
 
 7) Ran cpplint and cppcheck by creating a .sh file and saved output in '*result*' folder. 
 
-![cpplint_check_image](./../beginner_tutorials/result/cpplint_cppcheck_image.png "cpplint-cppcheck result")
+![cpplint_check_image](./result/cpplint_cppcheck_image.png "cpplint-cppcheck result")
 
 8) Updated *readme.md* file to inculcate build and run steps.
 
