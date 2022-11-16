@@ -1,9 +1,13 @@
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 # ROS Publisher/Subscriber
 
 ```
 Name - Shail Kiritkumar Shah
 
 UID - 119340547
+
+Assignment - ROS Publisher/Subscriber (Week 9 & 10)
 ```
 
 ## Overview
