@@ -154,9 +154,8 @@ class MinimalPublisher : public rclcpp::Node {
 
   void param_callback(const rclcpp::Parameter& param) {
     RCLCPP_INFO_STREAM(this->get_logger(),
-                 "Update to parameter : " <<
-                 param.get_name().c_str() <<
-                 param.as_double());
+                 "Update to parameter " << "\"" << param.get_name().c_str() << "\":"
+                  << param.as_double());
     RCLCPP_WARN_STREAM(this->get_logger(),
     "Base frequency changed, this might affect some features");
 
