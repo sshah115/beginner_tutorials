@@ -1,0 +1,30 @@
+# launch file to start both nodes at once and also set an argument 
+# using launch command
+launch:
+
+# start a talker node in the beginner_tutorials package
+- node:
+    pkg: "beginner_tutorials"
+    exec: "talker"
+    param:
+    -
+     name: "freq"
+     value: "$(var frequency)"
+
+# Remapping so both nodes listen to the same command topic
+- node:
+    pkg: "beginner_tutorials"
+    exec: "listener"
+
+- node:
+    pkg: "beginner_tutorials"
+    exec: "server"
+
+# Parameter to be modified else set default value
+- arg:
+    name: "frequency"
+    default: "5.0"
+
+
+    
+  
