@@ -60,7 +60,7 @@ class MinimalPublisher : public rclcpp::Node {
         exit(EXIT_FAILURE);
       }
       RCLCPP_WARN(rclcpp::get_logger("rclcpp"),
-                  "service not available, waiting again...");
+                  "Service unavailable, waiting for response...");
     }
 
     // Parameter for changing frequency of display.
@@ -70,11 +70,14 @@ class MinimalPublisher : public rclcpp::Node {
     // Fetching value of frequency from parameter server
     auto set_freq = this->get_parameter("freq");
     auto freq = set_freq.get_parameter_value().get<std::float_t>();
+    RCLCPP_DEBUG(this->get_logger(),
+          "Parameter frequency description and setting it to 5.0 hz");    
 
     // Making subscriber for Parameter
     // and setting up call back to modify frequency
     mod_param_subscriber_ =
         std::make_shared<rclcpp::ParameterEventHandler>(this);
+    RCLCPP_DEBUG(this->get_logger(), "ParameterEventHandler created");
     auto paramCallbackPtr =
         std::bind(&MinimalPublisher::param_callback, this, _1);
     mod_paramHandle_ =
@@ -82,6 +85,7 @@ class MinimalPublisher : public rclcpp::Node {
 
     // Creating publisher and setting frequency of message display
     publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
+    RCLCPP_DEBUG(this->get_logger(), "Publisher created");
     auto time_frame =
         std::chrono::milliseconds(static_cast<int>((1000 / freq)));
     timer_ = this->create_wall_timer(
@@ -100,6 +104,7 @@ class MinimalPublisher : public rclcpp::Node {
    * 10th second (because 10 % 10 == 0) calls service for client request.
    */
   void timer_callback() {
+    RCLCPP_INFO_STREAM_ONCE(this->get_logger(), "Node Setup Completed");
     auto message = std_msgs::msg::String();
     message.data =
         "Shail Kiritkumar Shah | ENPM808X " + std::to_string(count_++);
@@ -148,6 +153,15 @@ class MinimalPublisher : public rclcpp::Node {
   size_t count_;
 
   void param_callback(const rclcpp::Parameter& param) {
+    RCLCPP_INFO(this->get_logger(),
+                 "Update to parameter \"%s\": %.2f",
+                 param.get_name().c_str(),
+                 param.as_double());
+    RCLCPP_WARN(this->get_logger(),
+    "Base frequency changed, this might affect some features");
+
+    RCLCPP_FATAL_EXPRESSION(this->get_logger(), param.as_double() == 0.0,
+    "Frequency set to zero and will result in zero division error");    
     if (param.as_double() == 0.0) {
       RCLCPP_ERROR(
           this->get_logger(),
