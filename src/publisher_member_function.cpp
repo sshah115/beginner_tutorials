@@ -52,14 +52,14 @@ class MinimalPublisher : public rclcpp::Node {
     // Creating a Client
     client = this->create_client<beginner_tutorials::srv::ChangeString>(
         "change_string");
-    RCLCPP_DEBUG(this->get_logger(), "Client Generated");
+    RCLCPP_DEBUG_STREAM(this->get_logger(), "Client Generated");
     while (!client->wait_for_service(1s)) {
       if (!rclcpp::ok()) {
-        RCLCPP_FATAL(rclcpp::get_logger("rclcpp"),
+        RCLCPP_FATAL_STREAM(rclcpp::get_logger("rclcpp"),
                      "Interrupted while waiting for the service. Exiting.");
         exit(EXIT_FAILURE);
       }
-      RCLCPP_WARN(rclcpp::get_logger("rclcpp"),
+      RCLCPP_WARN_STREAM(rclcpp::get_logger("rclcpp"),
                   "Service unavailable, waiting for response...");
     }
 
@@ -70,14 +70,14 @@ class MinimalPublisher : public rclcpp::Node {
     // Fetching value of frequency from parameter server
     auto set_freq = this->get_parameter("freq");
     auto freq = set_freq.get_parameter_value().get<std::float_t>();
-    RCLCPP_DEBUG(this->get_logger(),
+    RCLCPP_DEBUG_STREAM(this->get_logger(),
           "Parameter frequency description and setting it to 5.0 hz");    
 
     // Making subscriber for Parameter
     // and setting up call back to modify frequency
     mod_param_subscriber_ =
         std::make_shared<rclcpp::ParameterEventHandler>(this);
-    RCLCPP_DEBUG(this->get_logger(), "ParameterEventHandler created");
+    RCLCPP_DEBUG_STREAM(this->get_logger(), "ParameterEventHandler created");
     auto paramCallbackPtr =
         std::bind(&MinimalPublisher::param_callback, this, _1);
     mod_paramHandle_ =
@@ -85,7 +85,7 @@ class MinimalPublisher : public rclcpp::Node {
 
     // Creating publisher and setting frequency of message display
     publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
-    RCLCPP_DEBUG(this->get_logger(), "Publisher created");
+    RCLCPP_DEBUG_STREAM(this->get_logger(), "Publisher created");
     auto time_frame =
         std::chrono::milliseconds(static_cast<int>((1000 / freq)));
     timer_ = this->create_wall_timer(
@@ -108,7 +108,7 @@ class MinimalPublisher : public rclcpp::Node {
     auto message = std_msgs::msg::String();
     message.data =
         "Shail Kiritkumar Shah | ENPM808X " + std::to_string(count_++);
-    RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
+    RCLCPP_INFO_STREAM(this->get_logger(), "Publishing: " << message.data.c_str());
     publisher_->publish(message);
     if (count_ % 10 == 0) {
       call_service();
@@ -129,7 +129,7 @@ class MinimalPublisher : public rclcpp::Node {
         std::make_shared<beginner_tutorials::srv::ChangeString::Request>();
     request->first_string = "Directory";
     request->second_string = "ID";
-    RCLCPP_INFO(this->get_logger(), "Calling Service to Modify string");
+    RCLCPP_INFO_STREAM(this->get_logger(), "Calling Service to Modify string");
     auto callbackPtr =
         std::bind(&MinimalPublisher::response_callback, this, _1);
     client->async_send_request(request, callbackPtr);
@@ -143,7 +143,7 @@ class MinimalPublisher : public rclcpp::Node {
    */
   void response_callback(sharedFuture success) {
     // Process the response
-    RCLCPP_INFO(this->get_logger(), "Received String: %s",
+    RCLCPP_INFO_STREAM(this->get_logger(), "Received String: " <<
                 success.get()->changed_string.c_str());
     Message = success.get()->changed_string.c_str();
   }
@@ -153,17 +153,17 @@ class MinimalPublisher : public rclcpp::Node {
   size_t count_;
 
   void param_callback(const rclcpp::Parameter& param) {
-    RCLCPP_INFO(this->get_logger(),
-                 "Update to parameter \"%s\": %.2f",
-                 param.get_name().c_str(),
+    RCLCPP_INFO_STREAM(this->get_logger(),
+                 "Update to parameter : " <<
+                 param.get_name().c_str() <<
                  param.as_double());
-    RCLCPP_WARN(this->get_logger(),
+    RCLCPP_WARN_STREAM(this->get_logger(),
     "Base frequency changed, this might affect some features");
 
     RCLCPP_FATAL_EXPRESSION(this->get_logger(), param.as_double() == 0.0,
     "Frequency set to zero and will result in zero division error");    
     if (param.as_double() == 0.0) {
-      RCLCPP_ERROR(
+      RCLCPP_ERROR_STREAM(
           this->get_logger(),
           "Frequency unchanged because it will result in zero division error");
     } else {
