@@ -156,6 +156,11 @@ class MinimalPublisher : public rclcpp::Node {
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
   size_t count_;
 
+  /**
+   * @brief In case of frequency change request through service, this
+   * function prints out useful logging messages.
+   * @param param
+   */
   void param_callback(const rclcpp::Parameter& param) {
     RCLCPP_INFO_STREAM(this->get_logger(), "Update to parameter "
                                                << "\""
