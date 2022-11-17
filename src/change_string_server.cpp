@@ -12,11 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @file change_string_server.cpp
+ * @author Shail Kiritkumar Shah (sshah115@umd.edu)
+ * @brief Responds to request for Modifying string.
+ * @version 0.1
+ * @date 2022-11-16
+ *
+ * @copyright Copyright (c) 2022
+ *
+ */
+
 #include <cstdlib>
 #include <iterator>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include "beginner_tutorials/srv/change_string.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -24,23 +35,31 @@
 using ChangeString = beginner_tutorials::srv::ChangeString;
 
 /**
- * @brief Callback function to process the request
- * 
- * @param request 
- * @param response 
+ * @brief Function to process the request of string change
+ *
+ * @param request
+ * @param response
  */
 void add(const std::shared_ptr<ChangeString::Request> request,
-          std::shared_ptr<ChangeString::Response> response) {
-  response->changed_string = request->first_string +" "+ request->second_string+" "+"119340547";
+         std::shared_ptr<ChangeString::Response> response) {
+  response->changed_string =
+      request->first_string + " " + request->second_string + " " + "119340547";
 }
 
+/**
+ * @brief main function
+ *
+ * @param argc
+ * @param argv
+ * @return int
+ */
 int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
   std::shared_ptr<rclcpp::Node> node =
-        rclcpp::Node::make_shared("modify_string_server");
+      rclcpp::Node::make_shared("change_string_server");
 
   rclcpp::Service<ChangeString>::SharedPtr service =
-  node->create_service<ChangeString>("change_string", &add);
+      node->create_service<ChangeString>("change_string", &add);
 
   RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Ready to change string.");
 
