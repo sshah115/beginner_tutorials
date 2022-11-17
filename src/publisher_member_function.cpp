@@ -49,10 +49,6 @@ using sharedFuture =
 class MinimalPublisher : public rclcpp::Node {
  public:
   MinimalPublisher() : Node("minimal_publisher"), count_(0) {
-    publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
-    timer_ = this->create_wall_timer(
-        500ms, std::bind(&MinimalPublisher::timer_callback, this));
-
     // Creating a Client
     client = this->create_client<beginner_tutorials::srv::ChangeString>(
         "change_string");
@@ -66,11 +62,37 @@ class MinimalPublisher : public rclcpp::Node {
       RCLCPP_WARN(rclcpp::get_logger("rclcpp"),
                   "service not available, waiting again...");
     }
+
+    // Parameter for changing frequency of display.
+    auto call_freq = rcl_interfaces::msg::ParameterDescriptor();
+    call_freq.description = "Set display frequency.";
+    this->declare_parameter("freq", 5.0, call_freq);
+    // Fetching value of frequency from parameter server
+    auto set_freq = this->get_parameter("freq");
+    auto freq = set_freq.get_parameter_value().get<std::float_t>();
+   
+    // Making subscriber for Parameter
+    // and setting up call back to modify frequency
+    mod_param_subscriber_ = std::make_shared<rclcpp::ParameterEventHandler>(this);
+    auto paramCallbackPtr =
+            std::bind(&MinimalPublisher::param_callback, this, _1);
+    mod_paramHandle_ =
+          mod_param_subscriber_->add_parameter_callback("freq", paramCallbackPtr);
+
+    // Creating publisher and setting frequency of message display
+    publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
+    auto time_frame = std::chrono::milliseconds(static_cast<int>((1000 / freq)));
+    timer_ = this->create_wall_timer(
+    time_frame, std::bind(&MinimalPublisher::timer_callback, this));
+
   }
 
  private:
   std::string Message;
   rclcpp::Client<beginner_tutorials::srv::ChangeString>::SharedPtr client;
+
+  std::shared_ptr<rclcpp::ParameterEventHandler>  mod_param_subscriber_;
+  std::shared_ptr<rclcpp::ParameterCallbackHandle> mod_paramHandle_;
 
   /**
    * @brief Timer callback function which prints the message and at every
@@ -123,6 +145,19 @@ class MinimalPublisher : public rclcpp::Node {
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
   size_t count_;
+
+  void param_callback(const rclcpp::Parameter & param) {
+    if (param.as_double() == 0.0) {
+      RCLCPP_ERROR(this->get_logger(),
+      "Frequency unchanged because it will result in zero division error");
+    } else {
+      auto time_frame =
+      std::chrono::milliseconds(static_cast<int> ((1000 / param.as_double())));
+      timer_ = this->create_wall_timer(
+      time_frame, std::bind(&MinimalPublisher::timer_callback, this));
+    }
+  }
+
 };
 
 /**
