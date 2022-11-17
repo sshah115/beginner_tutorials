@@ -55,12 +55,13 @@ class MinimalPublisher : public rclcpp::Node {
     RCLCPP_DEBUG_STREAM(this->get_logger(), "Client Generated");
     while (!client->wait_for_service(1s)) {
       if (!rclcpp::ok()) {
-        RCLCPP_FATAL_STREAM(rclcpp::get_logger("rclcpp"),
-                     "Interrupted while waiting for the service. Exiting.");
+        RCLCPP_FATAL_STREAM(
+            rclcpp::get_logger("rclcpp"),
+            "Interrupted while waiting for the service. Exiting.");
         exit(EXIT_FAILURE);
       }
       RCLCPP_WARN_STREAM(rclcpp::get_logger("rclcpp"),
-                  "Service unavailable, waiting for response...");
+                         "Service unavailable, waiting for response...");
     }
 
     // Parameter for changing frequency of display.
@@ -70,8 +71,9 @@ class MinimalPublisher : public rclcpp::Node {
     // Fetching value of frequency from parameter server
     auto set_freq = this->get_parameter("freq");
     auto freq = set_freq.get_parameter_value().get<std::float_t>();
-    RCLCPP_DEBUG_STREAM(this->get_logger(),
-          "Parameter frequency description and setting it to 5.0 hz");    
+    RCLCPP_DEBUG_STREAM(
+        this->get_logger(),
+        "Parameter frequency description and setting it to 5.0 hz");
 
     // Making subscriber for Parameter
     // and setting up call back to modify frequency
@@ -108,7 +110,8 @@ class MinimalPublisher : public rclcpp::Node {
     auto message = std_msgs::msg::String();
     message.data =
         "Shail Kiritkumar Shah | ENPM808X " + std::to_string(count_++);
-    RCLCPP_INFO_STREAM(this->get_logger(), "Publishing: " << message.data.c_str());
+    RCLCPP_INFO_STREAM(this->get_logger(),
+                       "Publishing: " << message.data.c_str());
     publisher_->publish(message);
     if (count_ % 10 == 0) {
       call_service();
@@ -143,8 +146,9 @@ class MinimalPublisher : public rclcpp::Node {
    */
   void response_callback(sharedFuture success) {
     // Process the response
-    RCLCPP_INFO_STREAM(this->get_logger(), "Received String: " <<
-                success.get()->changed_string.c_str());
+    RCLCPP_INFO_STREAM(
+        this->get_logger(),
+        "Received String: " << success.get()->changed_string.c_str());
     Message = success.get()->changed_string.c_str();
   }
 
@@ -153,14 +157,17 @@ class MinimalPublisher : public rclcpp::Node {
   size_t count_;
 
   void param_callback(const rclcpp::Parameter& param) {
-    RCLCPP_INFO_STREAM(this->get_logger(),
-                 "Update to parameter " << "\"" << param.get_name().c_str() << "\":"
-                  << param.as_double());
-    RCLCPP_WARN_STREAM(this->get_logger(),
-    "Base frequency changed, this might affect some features");
+    RCLCPP_INFO_STREAM(this->get_logger(), "Update to parameter "
+                                               << "\""
+                                               << param.get_name().c_str()
+                                               << "\":" << param.as_double());
+    RCLCPP_WARN_STREAM(
+        this->get_logger(),
+        "Base frequency changed, this might affect some features");
 
-    RCLCPP_FATAL_EXPRESSION(this->get_logger(), param.as_double() == 0.0,
-    "Frequency set to zero and will result in zero division error");    
+    RCLCPP_FATAL_EXPRESSION(
+        this->get_logger(), param.as_double() == 0.0,
+        "Frequency set to zero and will result in zero division error");
     if (param.as_double() == 0.0) {
       RCLCPP_ERROR_STREAM(
           this->get_logger(),
