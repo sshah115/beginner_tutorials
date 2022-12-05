@@ -32,6 +32,9 @@
 #include "beginner_tutorials/srv/change_string.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
+#include "geometry_msgs/msg/transform_stamped.hpp"
+#include "tf2/LinearMath/Quaternion.h"
+#include "tf2_ros/static_transform_broadcaster.h"
 
 using std::placeholders::_1;
 using namespace std::chrono_literals;
@@ -92,10 +95,13 @@ class MinimalPublisher : public rclcpp::Node {
         std::chrono::milliseconds(static_cast<int>((1000 / freq)));
     timer_ = this->create_wall_timer(
         time_frame, std::bind(&MinimalPublisher::timer_callback, this));
+
+    tf_static_broadcaster_ =std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
+    this->make_transforms();
   }
 
  private:
-  std::string Message;
+  std::string Message;  
   rclcpp::Client<beginner_tutorials::srv::ChangeString>::SharedPtr client;
 
   std::shared_ptr<rclcpp::ParameterEventHandler> mod_param_subscriber_;
@@ -184,6 +190,28 @@ class MinimalPublisher : public rclcpp::Node {
           time_frame, std::bind(&MinimalPublisher::timer_callback, this));
     }
   }
+  
+  void make_transforms()
+  {
+    geometry_msgs::msg::TransformStamped t;
+
+    t.header.stamp = this->get_clock()->now();
+    t.header.frame_id = "world";
+    t.child_frame_id = "talk";
+
+    t.transform.translation.x = 1;
+    t.transform.translation.y = 5;
+    t.transform.translation.z = 7;
+
+    t.transform.rotation.x = 4;
+    t.transform.rotation.y = 8;
+    t.transform.rotation.z = 3;
+    t.transform.rotation.w = 6;
+
+    tf_static_broadcaster_->sendTransform(t);
+  }
+
+  std::shared_ptr<tf2_ros::StaticTransformBroadcaster> tf_static_broadcaster_;
 };
 
 /**
@@ -194,6 +222,23 @@ class MinimalPublisher : public rclcpp::Node {
  * @return int
  */
 int main(int argc, char* argv[]) {
+  auto logger = rclcpp::get_logger("logger");
+
+  // Obtain parameters from command line arguments
+  // if (argc != 8) {
+  //   RCLCPP_INFO(
+  //     logger, "Invalid number of parameters\nusage: "
+  //     "$ ros2 run learning_tf2_cpp static_turtle_tf2_broadcaster "
+  //     "child_frame_name x y z roll pitch yaw");
+  //   return 1;
+  // }
+
+  // // As the parent frame of the transform is `world`, it is
+  // // necessary to check that the frame name passed is different
+  // if (strcmp(argv[1], "world") == 0) {
+  //   RCLCPP_INFO(logger, "Your static turtle name cannot be 'world'");
+  //   return 1;
+  // }
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<MinimalPublisher>());
   rclcpp::shutdown();
