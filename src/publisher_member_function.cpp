@@ -96,6 +96,7 @@ class MinimalPublisher : public rclcpp::Node {
     timer_ = this->create_wall_timer(
         time_frame, std::bind(&MinimalPublisher::timer_callback, this));
 
+    // funtion called to make static broadcast of transforms
     tf_static_broadcaster_ =std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
     this->make_transforms();
   }
