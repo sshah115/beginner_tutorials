@@ -16,7 +16,7 @@
  * @file main.cpp
  * @author Shail Kiritkumar Shah (sshah115@umd.edu)
  * @brief This file contains the main function which will integrate
- * all tests and run them. 
+ * all tests and run them.
  * @version 0.1
  * @date 2022-12-04
  *
