@@ -30,9 +30,9 @@
 #include <string>
 
 #include "beginner_tutorials/srv/change_string.hpp"
+#include "geometry_msgs/msg/transform_stamped.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
-#include "geometry_msgs/msg/transform_stamped.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/static_transform_broadcaster.h"
 
@@ -97,12 +97,13 @@ class MinimalPublisher : public rclcpp::Node {
         time_frame, std::bind(&MinimalPublisher::timer_callback, this));
 
     // funtion called to make static broadcast of transforms
-    tf_static_broadcaster_ =std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
+    tf_static_broadcaster_ =
+        std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
     this->make_transforms();
   }
 
  private:
-  std::string Message;  
+  std::string Message;
   rclcpp::Client<beginner_tutorials::srv::ChangeString>::SharedPtr client;
 
   std::shared_ptr<rclcpp::ParameterEventHandler> mod_param_subscriber_;
@@ -195,8 +196,7 @@ class MinimalPublisher : public rclcpp::Node {
    * @brief This will initiate the transformation between frames
    * by statically broadcasting the values to the coordinate frames
    */
-  void make_transforms()
-  {
+  void make_transforms() {
     geometry_msgs::msg::TransformStamped t;
 
     t.header.stamp = this->get_clock()->now();
