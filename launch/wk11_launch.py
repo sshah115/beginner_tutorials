@@ -4,7 +4,6 @@ from launch.actions import DeclareLaunchArgument, ExecuteProcess, TimerAction
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration, PythonExpression
 
-
 def generate_launch_description():
     bag_record = LaunchConfiguration('bag_record')
 
@@ -29,7 +28,7 @@ def generate_launch_description():
             PythonExpression([bag_record,' == True'])
         ),
         cmd=[[
-            'cd ../result /bag_files && ros2 bag record /topic '
+            'cd ../result/bag_files && ros2 bag record /chatter '
         ]],
         shell=True
     )

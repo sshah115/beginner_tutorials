@@ -89,7 +89,7 @@ class MinimalPublisher : public rclcpp::Node {
         mod_param_subscriber_->add_parameter_callback("freq", paramCallbackPtr);
 
     // Creating publisher and setting frequency of message display
-    publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
+    publisher_ = this->create_publisher<std_msgs::msg::String>("chatter", 10);
     RCLCPP_DEBUG_STREAM(this->get_logger(), "Publisher created");
     auto time_frame =
         std::chrono::milliseconds(static_cast<int>((1000 / freq)));
@@ -190,7 +190,10 @@ class MinimalPublisher : public rclcpp::Node {
           time_frame, std::bind(&MinimalPublisher::timer_callback, this));
     }
   }
-  
+  /**
+   * @brief This will initiate the transformation between frames
+   * by statically broadcasting the values to the coordinate frames
+   */
   void make_transforms()
   {
     geometry_msgs::msg::TransformStamped t;
