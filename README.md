@@ -1,41 +1,42 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-# ROS Services, Logging, and Launch files
+# ROS 2 tf2, unit testing, bag files
 
 ```
 Name - Shail Kiritkumar Shah
 
 UID - 119340547
 
-Assignment - ROS Services, Logging, & Launch files (Week 10)
+Assignment - ROS 2 tf2, unit testing, bag files (Week 11)
 ```
 
 ## Overview
 
-* This assignment starts off after successfully building a simple publisher/subscriber and introduces the basic concepts of services, logging messages and launch file. The previous ROS2 package is modified to accomodate the server/client and logging messages concept, the next tasks has following chronology:
+* This assignment is designed to understand the concept of tf2 (transformation frame) which is a tranform library for ROS2 and which maintains relationship between coordinate frames. So, the assignment had following tasks:
 
-1) A server/client pair is created by creating a '*.._server.cpp*' file and including client in the publisher *.cpp* file which requests a string change.
+1) Modify Talker node to broadcast a tf frame called /talk with parent /world. 
+![tf2_echo_image](./result/tf2_echo_image.png "tf2 echo result")
 
-2) All logging level messages are defined in event of parameter change and printed on *rqt_console*. Note: Debug logging messages are hidden and aren't shown on console as also mentioned in following reference:
-![logging_msg_image](./result/logging_msg_image.png "Logging messages result")
+2) Verifying TF frames using tf2_echo and use view_frames to show relationship between coordinate frames - World and Talk.
+![tf2_frames_image](./result/tf2_frames.png "tf2 frames result")
 
-3) Created '*launch.yaml*' file to run both nodes simultaneously and also to edit parameter if needed or set default value.
+3) Use gtest to create a Level 2 integration test, that tests your Talker node. And ensured it is passing as shown below.
+![test_passed_image](./result/test_passed_image.png "test passed result")
 
-4) Captured rqt images i.e '*rqt_console*' and '*rqt_graph*' while running both nodes to capture logging levels and publisher, subscriber and server relationship.
+4) Written a ROS launch file to launch ROS 2 bag and record all topics. Add an argument flag to the launch file that can disable/enable bag recording.
+![launch_bag_record_image](./result/launch_bag_record_image.png "launch with bag recording tag")
 
-5) Modified the code to adhere to *Google C++ Style Guide* using *clang-format* and provided *doxygen* comments.
+5) Record a bag file for ~15 seconds. Verify /chatter topic messages were collected using "ros2 bag info".
+![bag_record_play_image](./result/bag_record_play_image.png "playing recorded bag")
 
-6) Updated *package.xml* and *CMakeLists.txt* to add dependencies and executables.
+6) Run the Listener node ONLY (not Talker), and in another terminal use "ros2 bag play" to replay the topic messages. Verified that listener is printing messages.
+![listener_bag_file_image](./result/listener_bag_file_image.png "listener bag verification")
 
 7) Ran cpplint and cppcheck by creating a '*.sh*' file and saved output in '*result*' folder. 
 
 8) Added open source license to the repository, cpp files, and modified the license tag in package.xml.
 
 9) Updated *readme.md* file to inculcate build and run steps.
-
-All the above processes of publisher, subscriber, service call, param set, server node and rqt are ran simultaneously and shown below:
-![all_process_image](./result/all_process_image.png "All processes result")
-
 
 ## Dependencies
 
@@ -45,6 +46,9 @@ All the above processes of publisher, subscriber, service call, param set, serve
 | ROS version   | ROS 2 - Humble        |
 | ROS Code dependencies | rclcpp (ROS Client Lib for C++)
 | | stdmsgs (Stores ROS message types)
+| | geometry_msgs 
+| | tf2 
+| | tf2_ros
 
 
 ## Build instructions
@@ -125,6 +129,35 @@ Following command can be used to set a different frequency parameter than the de
 ros2 param set \minimal_publisher freq 0.5
 ```
 Note: Make sure the server node and talker node are initiated beforehand.
+
+## To record bag file
+
+Initiate all the nodes and bag record process by running the launch file by first navigating here:
+
+```
+cd ~/ros2_ws/src/beginner_tutorials/launch/
+```
+Run following code:
+```
+ros2 launch beginner_tutorials wk11_launch.py bag_record:=True
+
+```
+
+## Run the recorded bag file
+Navigate here:
+```
+cd ~/ros2_ws/src/beginner_tutorials/result/bag_files/
+```
+Select the bag file with following command:
+```
+ros2 bag info ...
+```
+Start the listener node:
+```
+ros2 run beginner_tutorials listener
+```
+Play the bag file:
+ros2 bag play ...
 
 ## Run cpp-tests
 To check for cpptests i.e cpplint & cppcheck, just write following command from package directory to output and save *.txt* file in *result* folder:
